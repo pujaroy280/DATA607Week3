@@ -1,0 +1,136 @@
+---
+title: "Week 3 R Character Manipulation and Date Processing"
+author: "Puja Roy"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+### Introduction
+The purpose of this assignment is to work with data manipulation involving strings and by using regex and testing the regular expressions by programming in R. 
+
+### Import Libraries
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+```
+
+### Part 1
+
+1) Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+
+```{r}
+url <- "https://raw.githubusercontent.com/pujaroy280/DATA607Week3/main/all-ages.csv"
+college_majors_data <- read.csv(url) # Data has 173 observations (rows) of 11 variables (columns)
+```
+
+```{r}
+head(college_majors_data)
+```
+
+```{r}
+# The dataset loaded or read into a variable is called 'college_majors_data'
+
+# Filter the dataset to include majors containing either "DATA" or "STATISTICS"
+majors_with_data_or_stats <- college_majors_data[grep(pattern = "DATA|STATISTICS", college_majors_data$Major, ignore.case = TRUE), ]
+
+# grep() function is used to search for patterns "DATA" or "STATISTICS" in the Major column of the college_majors dataset. The ignore.case = TRUE argument ensures that the search is case-insensitive.
+
+# Display the filtered majors
+print(majors_with_data_or_stats)
+
+```
+```{r}
+majors_with_data_or_stats$Major
+```
+Only 3 majors appeared and their major category included "Computers & Mathematics" and "Business".
+
+### Part 2
+2) Write code that transforms the data below:
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+[13] "olive"        "salal berry"
+Into a format like this:
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+
+```{r}
+fruits <- c("bell pepper", "bilberry", "blackberry", "blood orange",
+                   "blueberry", "cantaloupe", "chili pepper", "cloudberry",
+                   "elderberry", "lime", "lychee", "mulberry", "olive",
+                   "salal berry")
+fruits
+```
+```{r}
+# Transform the data
+# str_c is a function from the stringr package of R that concatenates strings.
+fruits_transform <- str_c("c(", str_c('"', fruits, '"', collapse = ", "), ")")
+str_view(fruits_transform)
+```
+
+### Part 3
+The two exercises below are taken from R for Data Science, 14.3.5.1 in the on-line version:
+3) Describe, in words, what these expressions will match:
+(.)\1\1
+"(.)(.)\\2\\1"
+(..)\1
+"(.).\\1.\\1"
+"(.)(.)(.).*\\3\\2\\1"
+```{r}
+expression1 <- "(.)\\1\\1"
+str_view(expression1)
+
+str_view(c(words,"888", "$$$", "ppp"), expression1)
+```
+(.)\1\1 matches any sequence of three characters where the first character is the same as the second and third characters.
+
+```{r}
+expression2 <- "(.)(.)\\2\\1"
+str_view(expression2)
+
+str_view(c(words), expression2)
+```
+The regular expression: "(.)(.)\\2\\1" matches a string length of four in which the first+fourth and second+third characters are the same. 
+```{r}
+expression3 <- "(..)\\1" # naming expression
+str_view(expression3) # string view of expression
+str_view(c(words, fruit), expression3) # testing matches
+```
+"(..)\1" is a regular expression that matches any string that has 2 identical characters.
+```{r}
+expression4 <- "(.).\\1.\\1"
+str_view(expression4) 
+str_view(c(words, fruit), expression4)
+```
+The regular expression: "(.).\\1.\\1" matches a string length of five in which the 3 characters including the first, third and fifth are the same. 
+```{r}
+expression5 <- "(.)(.)(.).*\\3\\2\\1"
+str_view(expression5) 
+str_view(c(words, fruit, "lalamimilala", "12345fedcba54321"), expression5)
+```
+The regular expression: "(.)(.)(.).*\\3\\2\\1" matches any string length that starts with three characters that consist of any characters. This expression matches the last three characters of the string in reverse order of the original string.
+
+### Part 4
+4) Construct regular expressions to match words that:
+Start and end with the same character.
+Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+```{r}
+expression6 <- "^(.).*\\1$" 
+str_view(expression6)
+str_view(c(words), expression6)
+```
+
+```{r}
+expression7 <- "(..).*\\1"
+str_view(expression7)
+str_view(c(words), expression7) 
+```
+
+```{r}
+expression8 <- "(.).*\\1.*\\1" 
+str_view(expression8) 
+str_view(c(words), expression8)
+```
+
+### Conclusion
+To sum it all up, I learned how to filter and work with regular expressions using Regex and R. It can often be confusing at the beginning due to the syntax, yet working on this assignment was rewarding since it provided me the knowledge of identifying patterns in strings.
